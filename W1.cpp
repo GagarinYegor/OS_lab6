@@ -12,15 +12,14 @@
 #include <sys/shm.h> 
 #include <sys/sem.h>
 
+struct sembuf{
+    unsigned short sem_num;
+    short sem_op;
+    short sem_flg;
+} buf{0, -1, 0};
 
 int main(){
     int shmId, semId, keySem, keyShm;
-    unsigned short ray[12]={0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    union semun {
-        int val;
-        unsigned short *array;
-    } arg;
-
     keySem = ftok("Sem", 1);
     if (keySem == -1) {
         perror("Sem ftok() Error");
@@ -32,9 +31,8 @@ int main(){
         perror("Sem get Error");
         exit(EXIT_FAILURE);
     }
-    printf("semId=%d\n", semId);
-
-    for (int i = 0; i < 6; i++) {
+    printf("Подключен набор семафоров, semId=%d\n", semId);
+    for(int i = 0; i < 6; i++){
         keyShm = ftok("Shm", i);
         if (keyShm == -1) {
             perror("Shm ftok Error");
@@ -42,18 +40,16 @@ int main(){
         }
         printf("keySem=%d, keyShm=%d \n", keySem, keyShm);
 
-        shmId = shmget(keyShm, 200, IPC_CREAT);
+        shmId = shmget(keyShm, 200, IPC_CREAT | 0606);
         if (shmId == -1) {
             perror("Shm get Error");
             exit(EXIT_FAILURE);
         }
+        
+        semop(semId[i], buf, 1);
+        
+        shmat(shmId, 0, 0);
         printf("shmId=%d\n", shmId);
-    }
-
-    arg.array = ray;
-    if (semctl(semId, 1, SETALL, arg) == -1) {
-        perror("Sem ctl Error");
-        exit(EXIT_FAILURE);
     }
     return(0);
 }

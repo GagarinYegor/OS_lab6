@@ -1,2 +1,3 @@
 all:
 	g++ creator.cpp -o creator
+	g++ policeman.cpp -o policeman
