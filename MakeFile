@@ -1,3 +1,6 @@
 all:
 	g++ creator.cpp -o creator
 	g++ policeman.cpp -o policeman
+	g++ writerX.cpp -o writerX
+	g++ readerX.cpp -o readerX
+	g++ readSem.cpp -o readSem
