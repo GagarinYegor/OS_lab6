@@ -37,18 +37,17 @@ void write_to_all_memory(int writerIndex) {
 
     // Записываем во все области памяти
     for (int i = 0; i < SHM_COUNT; i++) {
-        // Подключаемся к разделяемой памяти
+        // Подключаемся к разделяемой памяти        
         char* addr = (char*)shmat(shmId[i], nullptr, 0);
         if (addr == (char*)-1) {
             perror("Ошибка подключения к разделяемой памяти");
             continue;
         }
-
-        // Блокируем доступ для записи
-        semop(semIdW[i], &lockWrite, 1);
-
+        
         // Блокируем доступ для чтения
         semop(semIdR[i], &lockRead, 1);
+        // Блокируем доступ для записи
+        semop(semIdW[i], &lockWrite, 1);
 
         // Дозаписываем в память
         int currentLen = strlen(addr);
